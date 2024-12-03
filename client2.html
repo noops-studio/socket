@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Socket.IO Example</title>
+  <!-- Carga de jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <!-- Carga de la librería de Socket.IO -->
+  <script src="http://localhost:3000/socket.io/socket.io.js"></script>
+</head>
+<body>
+  <div id="messages"></div>
+
+  <script>
+    $(document).ready(function() {
+      var socket = io('http://localhost:3000'); 
+      var userId = 'user2'; 
+
+      // Registra el userId en el servidor
+      socket.emit('register', userId);
+
+      socket.on('message', function(message) {
+        //Swal.fire(message);
+		window.location.href = message;
+      });
+    });
+  </script>
+</body>
+</html>
