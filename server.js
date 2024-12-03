@@ -18,10 +18,6 @@ app.use(express.static('public'));
 
 const clients = {};
 
-// app.get('/', async (req, res) => {
-//   res.status(200).send({ res: 'ok' });
-// });
-
 app.post('/sendmsg', (req, res) => {
   const { tel, ext, grp, company } = req.body;
   const socketId = clients[`${company}${ext}`];
@@ -34,11 +30,6 @@ app.post('/sendmsg', (req, res) => {
     res.status(404).send({ status: 'User not connected' });
   }
 });
-
-
-
-
-
 
 io.on('connection', (socket) => {
   socket.on('register', (userid) => {
@@ -73,9 +64,7 @@ function notifyUser(userid, message) {
   }
 }
 
-
-
-const PORT = 443;
+const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
