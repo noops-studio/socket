@@ -75,7 +75,7 @@ function notifyUser(userid, message) {
 
 
 
-const PORT = 3000;
+const PORT = 443;
 server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
