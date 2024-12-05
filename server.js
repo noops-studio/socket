@@ -8,12 +8,22 @@ const server = http.createServer(app);
 const io = new socketIo(server, {
   cors: {
     origin: '*',
-    methods: ['POST']
-  }
+    methods: ['POST'],
+  },
 });
 
 app.use(cors());
 app.use(express.json());
+
+// Middleware to delay loading of JavaScript files
+app.use((req, res, next) => {
+  if (req.url.endsWith('.js')) {
+    setTimeout(() => next(), 10000); // Delay for 10 seconds
+  } else {
+    next();
+  }
+});
+
 app.use(express.static('public'));
 
 const clients = {};
@@ -32,6 +42,9 @@ app.post('/sendmsg', (req, res) => {
 });
 
 io.on('connection', (socket) => {
+  console.log(`Client connected: ${socket.id}`);
+
+  // Register user
   socket.on('register', (userid) => {
     if (clients[userid]) {
       clients[userid].push(socket.id);
@@ -41,7 +54,17 @@ io.on('connection', (socket) => {
     console.log(`User ${userid} registered with socket ID ${socket.id}`);
   });
 
+  // Simulate random disconnects every 2 seconds
+  const randomDisconnect = setInterval(() => {
+    if (Math.random() > 0.5) { // 50% chance to disconnect
+      console.log(`Randomly disconnecting: ${socket.id}`);
+      socket.disconnect();
+    }
+  }, 2000);
+
+  // Handle disconnect
   socket.on('disconnect', () => {
+    clearInterval(randomDisconnect);
     for (let userid in clients) {
       const index = clients[userid].indexOf(socket.id);
       if (index !== -1) {
@@ -58,7 +81,7 @@ io.on('connection', (socket) => {
 
 function notifyUser(userid, message) {
   if (clients[userid]) {
-    clients[userid].forEach(socketId => {
+    clients[userid].forEach((socketId) => {
       io.to(socketId).emit('notification', message);
     });
   }
